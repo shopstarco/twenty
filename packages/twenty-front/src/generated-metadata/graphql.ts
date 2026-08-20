@@ -1852,6 +1852,7 @@ export type FieldConfiguration = {
   fieldDisplayMode: FieldDisplayMode;
   fieldMetadataId: Scalars['String']['output'];
   nestedRelationFieldMetadataId?: Maybe<Scalars['String']['output']>;
+  startsExpanded?: Maybe<Scalars['Boolean']['output']>;
   viewId?: Maybe<Scalars['String']['output']>;
 };
 
@@ -7436,7 +7437,7 @@ export type PageLayoutFragmentFragment = { __typename?: 'PageLayout', id: string
         | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
         | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
         | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-        | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+        | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
         | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
         | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
         | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -7469,7 +7470,7 @@ export type PageLayoutTabFragmentFragment = { __typename?: 'PageLayoutTab', id: 
       | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
       | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
       | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-      | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+      | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
       | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
       | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
       | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -7514,7 +7515,7 @@ export type FindOnePageLayoutQuery = { __typename?: 'Query', getPageLayout?: { _
           | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
           | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
           | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -7903,7 +7904,7 @@ export type PageLayoutWidgetFragmentFragment = { __typename?: 'PageLayoutWidget'
     | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
     | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
     | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-    | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+    | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
     | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
     | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
     | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -7941,7 +7942,7 @@ export type ResetPageLayoutTabToDefaultMutation = { __typename?: 'Mutation', res
         | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
         | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
         | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-        | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+        | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
         | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
         | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
         | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -7979,7 +7980,7 @@ export type ResetPageLayoutToDefaultMutation = { __typename?: 'Mutation', resetP
           | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
           | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
           | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -8017,7 +8018,7 @@ export type ResetPageLayoutWidgetToDefaultMutation = { __typename?: 'Mutation', 
       | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
       | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
       | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-      | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+      | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
       | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
       | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
       | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -8056,7 +8057,7 @@ export type UpdatePageLayoutWithTabsAndWidgetsMutation = { __typename?: 'Mutatio
           | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
           | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
           | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -8106,7 +8107,7 @@ export type FindAllPageLayoutsQuery = { __typename?: 'Query', getPageLayouts: Ar
           | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
           | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
           | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }
@@ -8142,7 +8143,7 @@ export type FindAllRecordPageLayoutsQuery = { __typename?: 'Query', getPageLayou
           | { __typename?: 'CallRecordingTranscriptConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailThreadConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'EmailsConfiguration', configurationType: WidgetConfigurationType }
-          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null }
+          | { __typename?: 'FieldConfiguration', configurationType: WidgetConfigurationType, fieldDisplayMode: FieldDisplayMode, fieldMetadataId: string, viewId?: string | null, nestedRelationFieldMetadataId?: string | null, startsExpanded?: boolean | null }
           | { __typename?: 'FieldRichTextConfiguration', configurationType: WidgetConfigurationType }
           | { __typename?: 'FieldsConfiguration', configurationType: WidgetConfigurationType, viewId?: string | null, newFieldDefaultVisibility?: boolean | null, shouldAllowUserToSeeHiddenFields?: boolean | null }
           | { __typename?: 'FilesConfiguration', configurationType: WidgetConfigurationType }

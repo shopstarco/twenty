@@ -1,5 +1,6 @@
 import { CommandMenuItem } from '@/command-menu/components/CommandMenuItem';
 import { CommandMenuItemDropdown } from '@/command-menu/components/CommandMenuItemDropdown';
+import { CommandMenuItemToggle } from '@/command-menu/components/CommandMenuItemToggle';
 import { useFieldMetadataItemById } from '@/object-metadata/hooks/useFieldMetadataItemById';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { type FieldConfiguration } from '@/page-layout/types/FieldConfiguration';
@@ -22,6 +23,7 @@ import { WidgetSettingsManageSection } from '@/side-panel/pages/page-layout/comp
 import { WidgetSettingsPlacementSection } from '@/side-panel/pages/page-layout/components/WidgetSettingsPlacementSection';
 import { WIDGET_SETTINGS_SELECTABLE_ITEM_IDS } from '@/side-panel/pages/page-layout/constants/settings/WidgetSettingsSelectableItemIds';
 import { usePageLayoutIdFromContextStore } from '@/side-panel/pages/page-layout/hooks/usePageLayoutIdFromContextStore';
+import { useUpdateCurrentWidgetConfig } from '@/side-panel/pages/page-layout/hooks/useUpdateCurrentWidgetConfig';
 import { useWidgetInEditMode } from '@/side-panel/pages/page-layout/hooks/useWidgetInEditMode';
 import { useWidgetSettingsPlacementSelectableItemIds } from '@/side-panel/pages/page-layout/hooks/useWidgetSettingsPlacementSelectableItemIds';
 import { getWidgetViewLayoutSettingsItemIds } from '@/side-panel/pages/page-layout/utils/getWidgetViewLayoutSettingsItemIds';
@@ -33,6 +35,7 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
 import {
+  IconArrowsVertical,
   IconLayoutSidebarRight,
   IconList,
   IconListDetails,
@@ -64,6 +67,9 @@ export const SidePanelRecordPageFieldSettings = () => {
     useWidgetSettingsPlacementSelectableItemIds(pageLayoutId);
 
   const { navigateToSidePanelSubPage } = useSidePanelSubPageHistory();
+
+  const { updateCurrentWidgetConfig } =
+    useUpdateCurrentWidgetConfig(pageLayoutId);
 
   const { widgetInEditMode } = useWidgetInEditMode(pageLayoutId);
 
@@ -175,9 +181,20 @@ export const SidePanelRecordPageFieldSettings = () => {
     ? embeddedViewLayoutOption.Icon
     : IconLayoutSidebarRight;
 
+  const isCardDisplayMode = currentDisplayMode === FieldDisplayMode.CARD;
+
+  const isStartsExpandedToggled = fieldConfiguration?.startsExpanded === true;
+
+  const handleToggleStartsExpanded = () => {
+    updateCurrentWidgetConfig({
+      configToUpdate: { startsExpanded: !isStartsExpandedToggled },
+    });
+  };
+
   const selectableItemIds = [
     'field',
     'layout',
+    ...(isCardDisplayMode ? ['starts-expanded'] : []),
     ...(showViewLayoutRows
       ? getWidgetViewLayoutSettingsItemIds({
           isCalendarLayout: isEmbeddedViewCalendarLayout,
@@ -231,6 +248,20 @@ export const SidePanelRecordPageFieldSettings = () => {
                 contextualTextPosition="right"
               />
             </SelectableListItem>
+            {isCardDisplayMode && (
+              <SelectableListItem
+                itemId="starts-expanded"
+                onEnter={handleToggleStartsExpanded}
+              >
+                <CommandMenuItemToggle
+                  LeftIcon={IconArrowsVertical}
+                  text={t`Starts expanded`}
+                  id="starts-expanded"
+                  toggled={isStartsExpandedToggled}
+                  onToggleChange={handleToggleStartsExpanded}
+                />
+              </SelectableListItem>
+            )}
             {isTableDisplayMode &&
               isDefined(targetObjectMetadataId) &&
               isDefined(currentViewId) && (

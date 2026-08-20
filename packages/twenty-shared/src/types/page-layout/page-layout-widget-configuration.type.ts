@@ -104,6 +104,9 @@ export type FieldConfiguration = {
   // One-to-many relation field on the relation target object, to list records
   // two relation hops away (e.g. Company -> People -> Owned opportunities)
   nestedRelationFieldMetadataId?: string | null;
+  // CARD display mode only: open every related record when the card first
+  // renders, instead of the default collapsed accordion
+  startsExpanded?: boolean;
 };
 
 export type FieldsConfiguration = {

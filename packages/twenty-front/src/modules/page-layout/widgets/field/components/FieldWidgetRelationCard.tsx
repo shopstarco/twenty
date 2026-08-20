@@ -20,6 +20,7 @@ import { FieldWidgetShowMoreButton } from '@/page-layout/widgets/field/component
 import { FIELD_WIDGET_RELATION_CARD_INITIAL_VISIBLE_ITEMS } from '@/page-layout/widgets/field/constants/FieldWidgetRelationCardInitialVisibleItems';
 import { FIELD_WIDGET_RELATION_CARD_LOAD_MORE_INCREMENT } from '@/page-layout/widgets/field/constants/FieldWidgetRelationCardLoadMoreIncrement';
 import { generateFieldWidgetInstanceId } from '@/page-layout/widgets/field/utils/generateFieldWidgetInstanceId';
+import { useFieldWidgetCardExpansion } from '@/page-layout/widgets/field/hooks/useFieldWidgetCardExpansion';
 import { useCurrentWidget } from '@/page-layout/widgets/hooks/useCurrentWidget';
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
 import { SidePanelProvider } from '@/ui/layout/side-panel/contexts/SidePanelContext';
@@ -43,7 +44,7 @@ export const FieldWidgetRelationCard = ({
 }: FieldWidgetRelationCardProps) => {
   const widget = useCurrentWidget();
 
-  const [expandedItem, setExpandedItem] = useState('');
+  const { isItemExpanded, toggleItem } = useFieldWidgetCardExpansion();
   const [visibleItemsCount, setVisibleItemsCount] = useState(
     FIELD_WIDGET_RELATION_CARD_INITIAL_VISIBLE_ITEMS,
   );
@@ -55,9 +56,6 @@ export const FieldWidgetRelationCard = ({
     fieldName: fieldDefinition.metadata.fieldName,
     isInSidePanel,
   });
-
-  const handleItemClick = (recordId: string) =>
-    setExpandedItem(recordId === expandedItem ? '' : recordId);
 
   const handleShowMore = () => {
     setVisibleItemsCount(
@@ -152,8 +150,8 @@ export const FieldWidgetRelationCard = ({
                     }
                   />
                   <RecordDetailRelationRecordsListItem
-                    isExpanded={expandedItem === record.id}
-                    onClick={handleItemClick}
+                    isExpanded={isItemExpanded(record.id)}
+                    onClick={toggleItem}
                     relationRecord={record}
                     relationObjectMetadataNameSingular={
                       relationObjectNameSingular

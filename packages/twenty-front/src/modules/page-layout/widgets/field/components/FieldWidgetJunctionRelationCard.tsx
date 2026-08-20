@@ -22,6 +22,7 @@ import { FieldWidgetShowMoreButton } from '@/page-layout/widgets/field/component
 import { FIELD_WIDGET_RELATION_CARD_INITIAL_VISIBLE_ITEMS } from '@/page-layout/widgets/field/constants/FieldWidgetRelationCardInitialVisibleItems';
 import { FIELD_WIDGET_RELATION_CARD_LOAD_MORE_INCREMENT } from '@/page-layout/widgets/field/constants/FieldWidgetRelationCardLoadMoreIncrement';
 import { generateFieldWidgetInstanceId } from '@/page-layout/widgets/field/utils/generateFieldWidgetInstanceId';
+import { useFieldWidgetCardExpansion } from '@/page-layout/widgets/field/hooks/useFieldWidgetCardExpansion';
 import { useCurrentWidget } from '@/page-layout/widgets/hooks/useCurrentWidget';
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
 import { SidePanelProvider } from '@/ui/layout/side-panel/contexts/SidePanelContext';
@@ -47,7 +48,7 @@ export const FieldWidgetJunctionRelationCard = ({
 }: FieldWidgetJunctionRelationCardProps) => {
   const widget = useCurrentWidget();
 
-  const [expandedItem, setExpandedItem] = useState('');
+  const { isItemExpanded, toggleItem } = useFieldWidgetCardExpansion();
   const [visibleItemsCount, setVisibleItemsCount] = useState(
     FIELD_WIDGET_RELATION_CARD_INITIAL_VISIBLE_ITEMS,
   );
@@ -59,9 +60,6 @@ export const FieldWidgetJunctionRelationCard = ({
     fieldName: fieldDefinition.metadata.fieldName,
     isInSidePanel,
   });
-
-  const handleItemClick = (id: string) =>
-    setExpandedItem(id === expandedItem ? '' : id);
 
   const handleShowMore = () => {
     setVisibleItemsCount(
@@ -178,8 +176,8 @@ export const FieldWidgetJunctionRelationCard = ({
                     relationObjectMetadataNameSingular={item.objectNameSingular}
                   />
                   <RecordDetailRelationRecordsListItem
-                    isExpanded={expandedItem === item.record.id}
-                    onClick={handleItemClick}
+                    isExpanded={isItemExpanded(item.record.id)}
+                    onClick={toggleItem}
                     relationRecord={item.record}
                     relationObjectMetadataNameSingular={item.objectNameSingular}
                     relationFieldMetadataId=""

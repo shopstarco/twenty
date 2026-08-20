@@ -10,4 +10,5 @@ export type FieldConfiguration = {
   fieldDisplayMode: FieldDisplayMode;
   viewId?: string;
   nestedRelationFieldMetadataId?: string | null;
+  startsExpanded?: boolean;
 };
