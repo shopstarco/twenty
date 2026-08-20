@@ -342,6 +342,7 @@ export const fromPageLayoutWidgetConfigurationToUniversalConfiguration = ({
         configurationType,
         viewId,
         nestedRelationFieldMetadataId,
+        ...rest
       } = configuration;
 
       const fieldMetadataUniversalIdentifier =
@@ -379,6 +380,7 @@ export const fromPageLayoutWidgetConfigurationToUniversalConfiguration = ({
       }
 
       return {
+        ...rest,
         configurationType,
         fieldMetadataId: fieldMetadataUniversalIdentifier ?? fieldMetadataId,
         fieldDisplayMode,
