@@ -3,7 +3,7 @@ name: shopstar - build image
 on:
   push:
     branches:
-      - upgrade/twenty-upstream-20261022
+      - main
   workflow_dispatch:
     inputs:
       image_tag:
