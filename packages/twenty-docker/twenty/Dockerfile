@@ -1,8 +1,14 @@
 # ===========================================================================
+# Base image
+# ===========================================================================
+
+FROM node:24.22.1-alpine3.23@sha256:0468540aa58203ff9e40c2aab3907c52644ab818af6176b1c70a026137dc92a2 AS node-base
+
+# ===========================================================================
 # Dependency stages
 # ===========================================================================
 
-FROM node:24.18.0-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS front-deps
+FROM node-base AS front-deps
 
 WORKDIR /app
 
@@ -20,7 +26,7 @@ COPY ./packages/twenty-client-sdk/package.json /app/packages/twenty-client-sdk/
 RUN yarn workspaces focus twenty twenty-front twenty-front-component-renderer twenty-ui twenty-shared twenty-sdk twenty-client-sdk && yarn cache clean && npx nx reset
 
 
-FROM node:24.18.0-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS server-deps
+FROM node-base AS server-deps
 
 WORKDIR /app
 
@@ -84,11 +90,10 @@ RUN if [ -d /app/packages/twenty-front/build ]; then \
 #   docker build --target twenty-server -f packages/twenty-docker/twenty/Dockerfile .
 # ===========================================================================
 
-FROM node:24.18.0-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS twenty-server
+FROM node-base AS twenty-server
 
-# Force the patched Alpine OpenSSL libs (base bakes 3.5.6-r0; repo ships
-# 3.5.7-r0). Node bundles its own OpenSSL, but psql/curl link these system
-# libs, so the upgrade hardens runtime TLS and clears the scanner.
+# Keep Alpine's OpenSSL and client tools current. Node bundles its own OpenSSL,
+# but psql/curl link these system libraries.
 RUN apk add --no-cache \
     'curl>=8.20.0-r0' \
     'nghttp2-libs>=1.69.0-r0' \
@@ -142,12 +147,9 @@ LABEL org.opencontainers.image.description="Twenty server image (no frontend)."
 #  - the Node dev headers: only node-gyp needs them and native addons are
 #    compiled in the build stages; their vendored openssl/opensslv.h is what
 #    scanners fingerprint whenever OpenSSL patches ahead of Node releases.
-# The pinned node:24.18.0-alpine base carries every 24.17.0 security fix
-# (OpenSSL 3.5.7, CVE-2026-48930) plus the fix for the http.Agent keep-alive
-# regression (nodejs/node#64004) that flooded prod with false "Premature close"
-# fetch failures on 24.17.0 (see #22671/#22673). Do not pin 24.17.0 again.
-# Keep the base current when Node ships 24.x security releases — the scanner
-# flags the statically-linked node binary itself.
+# The pinned Node 24.22.1 base includes the eMudhra CA block and the earlier
+# http.Agent keep-alive fix (nodejs/node#64004). Keep the base current when
+# Node ships 24.x security releases; scanners flag the linked Node binary.
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
       /usr/local/include/node && \
     find /app/node_modules -type d -name example -prune -exec rm -rf {} +
@@ -222,7 +224,7 @@ RUN S6_ARCH=$(cat /tmp/s6arch) && \
     echo "$NOARCH_SUM  s6-overlay-noarch.tar.xz" | sha256sum -c - && \
     echo "$ARCH_SUM  s6-overlay-arch.tar.xz" | sha256sum -c -
 
-FROM node:24.18.0-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS twenty-app-dev
+FROM node-base AS twenty-app-dev
 
 # s6-overlay
 COPY --from=s6-fetch /tmp/s6-overlay-noarch.tar.xz /tmp/
