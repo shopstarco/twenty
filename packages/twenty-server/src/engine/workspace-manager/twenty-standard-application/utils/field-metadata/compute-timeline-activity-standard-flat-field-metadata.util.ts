@@ -8,6 +8,7 @@ import {
   RelationType,
 } from 'twenty-shared/types';
 
+import { createStandardMorphRelationHeadFlatMetadata } from 'src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/create-standard-morph-relation-head-flat-metadata.util';
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { type AllStandardObjectFieldName } from 'src/engine/workspace-manager/twenty-standard-application/types/all-standard-object-field-name.type';
 import {
@@ -35,9 +36,9 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
     context: {
       fieldName: 'id',
       type: FieldMetadataType.UUID,
-      label: i18nLabel(msg({ message: `Id`, context: 'fieldMetadata.label' })),
+      label: i18nLabel(msg({ message: `ID`, context: 'fieldMetadata.label' })),
       description: i18nLabel(
-        msg({ message: `Id`, context: 'fieldMetadata.description' }),
+        msg({ message: `ID`, context: 'fieldMetadata.description' }),
       ),
       icon: 'Icon123',
       isSystem: true,
@@ -234,19 +235,48 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
     twentyStandardApplicationId,
     now,
   }),
-  name: createStandardFieldFlatMetadata({
+  timelineActivityTypeId: createStandardFieldFlatMetadata({
     objectName,
     workspaceId,
     context: {
-      fieldName: 'name',
-      type: FieldMetadataType.TEXT,
+      fieldName: 'timelineActivityTypeId',
+      type: FieldMetadataType.UUID,
       label: i18nLabel(
-        msg({ message: `Event name`, context: 'fieldMetadata.label' }),
+        msg({ message: `Event type`, context: 'fieldMetadata.label' }),
       ),
       description: i18nLabel(
-        msg({ message: `Event name`, context: 'fieldMetadata.description' }),
+        msg({
+          message: `Timeline activity type describing this event`,
+          context: 'fieldMetadata.description',
+        }),
       ),
       icon: 'IconAbc',
+      isSystem: true,
+      isNullable: true,
+      isUIEditable: false,
+    },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  timelineActivityTypeSnapshot: createStandardFieldFlatMetadata({
+    objectName,
+    workspaceId,
+    context: {
+      fieldName: 'timelineActivityTypeSnapshot',
+      type: FieldMetadataType.RAW_JSON,
+      label: i18nLabel(
+        msg({ message: `Event type`, context: 'fieldMetadata.label' }),
+      ),
+      description: i18nLabel(
+        msg({
+          message: `Timeline activity type describing this event`,
+          context: 'fieldMetadata.description',
+        }),
+      ),
+      icon: 'IconArchive',
+      isSystem: true,
       isNullable: true,
       isUIEditable: false,
     },
@@ -266,7 +296,7 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
       ),
       description: i18nLabel(
         msg({
-          message: `Json value for event details`,
+          message: `JSON value for event details`,
           context: 'fieldMetadata.description',
         }),
       ),
@@ -340,13 +370,13 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
       type: FieldMetadataType.UUID,
       label: i18nLabel(
         msg({
-          message: `Linked Object Metadata Id`,
+          message: `Linked Object Metadata ID`,
           context: 'fieldMetadata.label',
         }),
       ),
       description: i18nLabel(
         msg({
-          message: `Linked Object Metadata Id`,
+          message: `Linked Object Metadata ID`,
           context: 'fieldMetadata.description',
         }),
       ),
@@ -377,7 +407,7 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
           context: 'fieldMetadata.description',
         }),
       ),
-      icon: 'IconCircleUser',
+      icon: 'IconUsers',
       isNullable: true,
       isUIEditable: false,
       targetObjectName: 'workspaceMember',
@@ -388,6 +418,14 @@ export const buildTimelineActivityStandardFlatFieldMetadatas = ({
         joinColumnName: 'workspaceMemberId',
       },
     },
+    standardObjectMetadataRelatedEntityIds,
+    dependencyFlatEntityMaps,
+    twentyStandardApplicationId,
+    now,
+  }),
+  target: createStandardMorphRelationHeadFlatMetadata({
+    objectName,
+    workspaceId,
     standardObjectMetadataRelatedEntityIds,
     dependencyFlatEntityMaps,
     twentyStandardApplicationId,

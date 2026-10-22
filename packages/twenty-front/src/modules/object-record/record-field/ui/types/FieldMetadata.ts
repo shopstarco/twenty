@@ -11,8 +11,10 @@ import {
 import { type ThemeColor } from 'twenty-ui/theme';
 import { z } from 'zod';
 import { type RelationType } from '~/generated-metadata/graphql';
+import { doNotTranslate } from 'twenty-shared/i18n';
 
 type BaseFieldMetadata = {
+  description?: string | null;
   fieldName: string;
   objectMetadataNameSingular?: string;
   applicationId?: string | null;
@@ -243,6 +245,14 @@ export type FieldLinksValue = {
   primaryLinkUrl: string | null;
   secondaryLinks?: { label: string | null; url: string | null }[] | null;
 };
+export type FormFieldLinksValue = {
+  primaryLinkLabel: string | null;
+  primaryLinkUrl: string | null;
+  secondaryLinks?:
+    | { label: string | null; url: string | null }[]
+    | string
+    | null;
+};
 
 export const fieldMetadataCurrencyFormat = ['short', 'full'] as const;
 export type FieldCurrencyFormat = (typeof fieldMetadataCurrencyFormat)[number];
@@ -298,7 +308,7 @@ export type FieldRichTextValue = {
 };
 
 const FieldActorSourceSchema = z.union([
-  z.literal('API'),
+  z.literal(doNotTranslate('API')),
   z.literal('IMPORT'),
   z.literal('EMAIL'),
   z.literal('CALENDAR'),
@@ -316,7 +326,9 @@ export const FieldActorValueSchema = z.object({
   name: z.string(),
   context: z
     .object({
-      provider: z.enum(ConnectedAccountProvider).optional(),
+      // GraphQL ActorContext returns provider: null for MANUAL/SYSTEM/… actors
+      provider: z.enum(ConnectedAccountProvider).nullish(),
+      applicationId: z.string().nullish(),
     })
     .nullable(),
 });
@@ -335,11 +347,17 @@ export type PhoneRecord = {
   countryCode: string;
 };
 
+export type PhoneRecordNullable = {
+  number: string | null;
+  callingCode: string | null;
+  countryCode: string | null;
+};
+
 export type FieldPhonesValue = {
-  primaryPhoneNumber: string;
-  primaryPhoneCountryCode: string;
-  primaryPhoneCallingCode?: string;
-  additionalPhones?: PhoneRecord[] | null;
+  primaryPhoneNumber: string | null;
+  primaryPhoneCountryCode: string | null;
+  primaryPhoneCallingCode?: string | null;
+  additionalPhones?: PhoneRecordNullable[] | null;
 };
 
 export type FieldFilesValue = {

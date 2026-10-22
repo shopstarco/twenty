@@ -7,8 +7,8 @@ import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
-import { Chip, ChipVariant } from 'twenty-ui/data-display';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { Chip } from 'twenty-ui/primitives/data-display';
+import { themeCssVariables } from 'twenty-ui/theme';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 
 const StyledRecordChipContainer = styled.div`
@@ -51,23 +51,11 @@ const LegacyMentionRenderer = ({
   }
 
   if (!isDefined(objectMetadataItem)) {
-    return (
-      <Chip
-        label={t`Unknown object`}
-        variant={ChipVariant.Transparent}
-        disabled
-      />
-    );
+    return <Chip variant="plain" aria-disabled>{t`Unknown object`}</Chip>;
   }
 
   if (!isDefined(record)) {
-    return (
-      <Chip
-        label={t`Deleted record`}
-        variant={ChipVariant.Transparent}
-        disabled
-      />
-    );
+    return <Chip variant="plain" aria-disabled>{t`Deleted record`}</Chip>;
   }
 
   return (

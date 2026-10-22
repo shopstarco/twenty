@@ -10,7 +10,7 @@ import { In, Repository } from 'typeorm';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { CalendarChannelEntity } from 'src/engine/metadata-modules/calendar-channel/entities/calendar-channel.entity';
 import { ConnectedAccountEntity } from 'src/engine/metadata-modules/connected-account/entities/connected-account.entity';
-import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
+import { WorkspaceOrmManager } from 'src/engine/twenty-orm/workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { type CalendarChannelEventAssociationWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-channel-event-association.workspace-entity';
 import { type CalendarEventWorkspaceEntity } from 'src/modules/calendar/common/standard-objects/calendar-event.workspace-entity';
@@ -18,7 +18,7 @@ import { type CalendarEventWorkspaceEntity } from 'src/modules/calendar/common/s
 @Injectable()
 export class ApplyCalendarEventsVisibilityRestrictionsService {
   constructor(
-    private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly workspaceOrmManager: WorkspaceOrmManager,
     @InjectRepository(ConnectedAccountEntity)
     private readonly connectedAccountRepository: Repository<ConnectedAccountEntity>,
     @InjectRepository(UserWorkspaceEntity)
@@ -34,12 +34,12 @@ export class ApplyCalendarEventsVisibilityRestrictionsService {
   ) {
     const authContext = buildSystemAuthContext(workspaceId);
 
-    return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+    return this.workspaceOrmManager.executeInWorkspaceContext(
       async () => {
         const calendarChannelEventAssociationRepository =
-          await this.globalWorkspaceOrmManager.getRepository<CalendarChannelEventAssociationWorkspaceEntity>(
-            workspaceId,
+          this.workspaceOrmManager.getRepository<CalendarChannelEventAssociationWorkspaceEntity>(
             'calendarChannelEventAssociation',
+            { shouldBypassPermissionChecks: true },
           );
 
         const calendarChannelCalendarEventsAssociations =
@@ -71,10 +71,9 @@ export class ApplyCalendarEventsVisibilityRestrictionsService {
           calendarChannelsFromCore.map((channel) => [channel.id, channel]),
         );
 
-        for (let i = calendarEvents.length - 1; i >= 0; i--) {
+        for (const calendarEvent of calendarEvents) {
           const associations = calendarChannelCalendarEventsAssociations.filter(
-            (association) =>
-              association.calendarEventId === calendarEvents[i].id,
+            (association) => association.calendarEventId === calendarEvent.id,
           );
 
           const calendarChannels = associations
@@ -120,19 +119,10 @@ export class ApplyCalendarEventsVisibilityRestrictionsService {
             }
           }
 
-          if (
-            calendarChannelsGroupByVisibility[
-              CalendarChannelVisibility.METADATA
-            ]
-          ) {
-            calendarEvents[i].title =
-              FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED;
-            calendarEvents[i].description =
-              FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED;
-            continue;
-          }
-
-          calendarEvents.splice(i, 1);
+          calendarEvent.title =
+            FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED;
+          calendarEvent.description =
+            FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED;
         }
 
         return calendarEvents;

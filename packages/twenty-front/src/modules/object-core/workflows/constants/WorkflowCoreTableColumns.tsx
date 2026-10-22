@@ -1,8 +1,14 @@
 import { msg } from '@lingui/core/macro';
+import {
+  IconCalendarTime,
+  IconShare,
+  IconStatusChange,
+  IconTextSize,
+} from 'twenty-ui/icon';
 
-import { AppChip } from '@/applications/components/AppChip';
 import { CoreWorkflowNameCell } from '@/object-core/workflows/components/CoreWorkflowNameCell';
 import { CoreWorkflowStatusesCell } from '@/object-core/workflows/components/CoreWorkflowStatusesCell';
+import { CoreWorkflowVisibilityCell } from '@/object-core/workflows/components/CoreWorkflowVisibilityCell';
 import { type CoreObjectTableColumn } from '@/object-core/types/CoreObjectTableColumn';
 import { DateTimeDisplay } from '@/ui/field/display/components/DateTimeDisplay';
 import { type CoreWorkflow } from '@/object-core/workflows/types/CoreWorkflow';
@@ -12,14 +18,18 @@ export const WORKFLOW_CORE_TABLE_COLUMNS: CoreObjectTableColumn<CoreWorkflow>[] 
     {
       fieldName: 'name',
       fieldLabel: msg`Name`,
+      FieldIcon: IconTextSize,
       fieldType: 'string',
       align: 'left',
-      gridTrack: 'minmax(0, 1fr)',
-      renderCell: (workflow) => <CoreWorkflowNameCell name={workflow.name} />,
+      gridTrack: 'minmax(200px, 1fr)',
+      renderCell: (workflow) => (
+        <CoreWorkflowNameCell name={workflow.name} workflowId={workflow.id} />
+      ),
     },
     {
       fieldName: 'statuses',
-      fieldLabel: msg`Status`,
+      fieldLabel: msg`Statuses`,
+      FieldIcon: IconStatusChange,
       align: 'left',
       gridTrack: '160px',
       renderCell: (workflow) => (
@@ -27,20 +37,22 @@ export const WORKFLOW_CORE_TABLE_COLUMNS: CoreObjectTableColumn<CoreWorkflow>[] 
       ),
     },
     {
-      fieldName: 'applicationId',
-      fieldLabel: msg`App`,
+      fieldName: 'visibility',
+      fieldLabel: msg`Visibility`,
+      FieldIcon: IconShare,
       align: 'left',
-      gridTrack: '160px',
+      gridTrack: '120px',
       renderCell: (workflow) => (
-        <AppChip applicationId={workflow.applicationId} />
+        <CoreWorkflowVisibilityCell visibility={workflow.visibility} />
       ),
     },
     {
       fieldName: 'updatedAt',
       fieldLabel: msg`Last update`,
+      FieldIcon: IconCalendarTime,
       fieldType: 'string',
       align: 'left',
-      gridTrack: '180px',
+      gridTrack: '150px',
       renderCell: (workflow) => <DateTimeDisplay value={workflow.updatedAt} />,
     },
   ];

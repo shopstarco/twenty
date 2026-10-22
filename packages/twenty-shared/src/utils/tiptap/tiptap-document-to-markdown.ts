@@ -1,4 +1,5 @@
 import { formatRecordReference } from '@/ai/utils/format-record-reference.util';
+import { formatSkillReference } from '@/ai/utils/format-skill-reference.util';
 
 import { parseTipTapJsonDocument } from './parse-tiptap-json-document';
 import { type TipTapDocument } from './tiptap-document';
@@ -30,7 +31,7 @@ const MARKDOWN_DESTINATION_CHARACTER_ESCAPES: Readonly<Record<string, string>> =
 const escapeMarkdownDestination = (destination: string): string =>
   destination.replace(/[\\()<>\s]/g, (character) =>
     character in MARKDOWN_DESTINATION_CHARACTER_ESCAPES
-      ? MARKDOWN_DESTINATION_CHARACTER_ESCAPES[character]
+      ? (MARKDOWN_DESTINATION_CHARACTER_ESCAPES[character] ?? character)
       : encodeURIComponent(character),
   );
 
@@ -76,6 +77,17 @@ const renderMention = (node: TipTapNode): string => {
   return '';
 };
 
+const renderSkillTag = (node: TipTapNode): string => {
+  const skillId = node.attrs?.skillId;
+  const label = node.attrs?.label;
+
+  if (typeof skillId === 'string' && typeof label === 'string') {
+    return formatSkillReference({ skillId, label });
+  }
+
+  return typeof label === 'string' ? label : '';
+};
+
 const renderListItem = (item: TipTapNode, marker: string): string => {
   const [firstLine = '', ...continuationLines] = renderChildren(item)
     .trim()
@@ -111,6 +123,8 @@ const renderTipTapNodeToMarkdown = (node: TipTapNode): string => {
         : '';
     case TIPTAP_NODE_TYPES.MENTION_TAG:
       return renderMention(node);
+    case TIPTAP_NODE_TYPES.SKILL_TAG:
+      return renderSkillTag(node);
     case TIPTAP_NODE_TYPES.HEADING: {
       const level =
         typeof node.attrs?.level === 'number' ? node.attrs.level : 1;
@@ -123,6 +137,15 @@ const renderTipTapNodeToMarkdown = (node: TipTapNode): string => {
       return `${(node.content ?? [])
         .map((item) => renderListItem(item, '- '))
         .join('')}\n`;
+    case TIPTAP_NODE_TYPES.TASK_LIST:
+      return `${(node.content ?? [])
+        .map((item) =>
+          renderListItem(
+            item,
+            item.attrs?.checked === true ? '- [x] ' : '- [ ] ',
+          ),
+        )
+        .join('')}\n`;
     case TIPTAP_NODE_TYPES.ORDERED_LIST: {
       const start =
         typeof node.attrs?.start === 'number' ? node.attrs.start : 1;
@@ -131,6 +154,12 @@ const renderTipTapNodeToMarkdown = (node: TipTapNode): string => {
         .map((item, index) => renderListItem(item, `${start + index}. `))
         .join('')}\n`;
     }
+    case TIPTAP_NODE_TYPES.BLOCKQUOTE:
+      return `${renderChildren(node)
+        .trim()
+        .split('\n')
+        .map((line) => (line === '' ? '>' : `> ${line}`))
+        .join('\n')}\n\n`;
     case TIPTAP_NODE_TYPES.IMAGE: {
       const alt = typeof node.attrs?.alt === 'string' ? node.attrs.alt : '';
       const src = typeof node.attrs?.src === 'string' ? node.attrs.src : '';

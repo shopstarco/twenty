@@ -1,12 +1,11 @@
-import { type MouseEvent } from 'react';
-
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
-import { getAvatarType } from '@/object-metadata/utils/getAvatarType';
-import { Avatar } from 'twenty-ui/data-display';
-import { MenuItemSuggestion } from 'twenty-ui/navigation';
+import { getAvatarShape } from '@/object-metadata/utils/getAvatarShape';
+import { SuggestionListItem } from '@/ui/suggestion/components/SuggestionListItem';
+import { Avatar } from 'twenty-ui/primitives/data-display';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 
 type MentionMenuListItemProps = {
+  id: string;
   recordId: string;
   objectNameSingular: string;
   label: string;
@@ -17,6 +16,7 @@ type MentionMenuListItemProps = {
 };
 
 export const MentionMenuListItem = ({
+  id,
   recordId,
   objectNameSingular,
   label,
@@ -31,28 +31,23 @@ export const MentionMenuListItem = ({
     (item) => item.nameSingular === objectNameSingular,
   );
 
-  const handleClick = (event?: MouseEvent) => {
-    event?.preventDefault();
-    event?.stopPropagation();
-    onClick();
-  };
-
   return (
-    <MenuItemSuggestion
+    <SuggestionListItem
+      id={id}
       selected={isSelected}
-      onClick={handleClick}
-      text={label}
-      contextualText={objectLabelSingular}
-      contextualTextPosition="left"
-      LeftIcon={() => (
+      onSelect={onClick}
+      description={objectLabelSingular}
+      startIcon={
         <Avatar
-          placeholder={label}
-          placeholderColorSeed={recordId}
-          avatarUrl={getAbsoluteImageUrl(imageUrl)}
-          type={getAvatarType(objectMetadataItem)}
+          name={label}
+          colorSeed={recordId}
+          src={getAbsoluteImageUrl(imageUrl)}
+          shape={getAvatarShape(objectMetadataItem)}
           size="sm"
         />
-      )}
-    />
+      }
+    >
+      {label}
+    </SuggestionListItem>
   );
 };

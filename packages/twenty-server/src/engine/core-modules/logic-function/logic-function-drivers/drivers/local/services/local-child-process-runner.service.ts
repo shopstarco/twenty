@@ -10,8 +10,7 @@ import { getLocalSdkLayerPath } from 'src/engine/core-modules/logic-function/log
 import { HANDLER_NAME_REGEX } from 'src/engine/metadata-modules/logic-function/constants/handler.contant';
 
 export class LocalChildProcessRunnerService {
-  // Symlinks everything from the deps layer except twenty-client-sdk,
-  // which comes from the SDK layer (workspace-specific generated client).
+  // twenty-client-sdk comes from the SDK layer (workspace-specific generated client), not the deps layer.
   async assembleNodeModules({
     sourceTemporaryDir,
     flatApplication,
@@ -116,10 +115,12 @@ export class LocalChildProcessRunnerService {
               }
             });
           } else {
-            // Fallback: read payload from argv[2] (JSON) and print to stdout
+            // Fallback for a runner started without IPC: the context travels as
+            // argv[3] because the script is written once, before any run exists.
             const json = process.argv[2];
             payload = json ? JSON.parse(json) : undefined;
-            const out = await handlerFn(payload, { retryCount: 0, maxRetries: 0 });
+            const contextJson = process.argv[3];
+            const out = await handlerFn(payload, contextJson ? JSON.parse(contextJson) : undefined);
             process.stdout.write(JSON.stringify({ ok: true, result: out }), () => process.exit(0));
           }
         } catch (error) {

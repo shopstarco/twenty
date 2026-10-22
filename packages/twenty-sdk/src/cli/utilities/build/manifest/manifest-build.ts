@@ -11,9 +11,11 @@ import { fromRoleConfigToRoleManifest } from '@/cli/utilities/build/manifest/uti
 import { getDefaultFieldsInObjectFields } from '@/cli/utilities/build/manifest/utils/get-default-fields-in-object-fields';
 import { extractFrontComponentSharedDependencies } from '@/cli/utilities/build/manifest/utils/extract-front-component-shared-dependencies';
 import { validateConditionalAvailabilityUsage } from '@/cli/utilities/build/manifest/utils/validate-conditional-availability-usage';
+import { validateAgentRolesWithinApplicationRole } from '@/cli/utilities/build/manifest/utils/validate-agent-roles-within-application-role';
 import { validateViewFilterOperands } from '@/cli/utilities/build/manifest/utils/validate-view-filter-operands';
 import { getEngineVersionRange } from '@/cli/utilities/version/get-engine-version-range';
-import { type ApplicationConfig, type LogicFunctionConfig } from '@/sdk/define';
+import { type ApplicationConfig } from '@/sdk/define/application/application-config';
+import { type LogicFunctionConfig } from '@/sdk/define/logic-functions/logic-function-config';
 import { type CommandMenuItemConfig } from '@/sdk/define/command-menu-items/command-menu-item-config';
 import { type FrontComponentConfig } from '@/sdk/define/front-component/front-component-config';
 import { type IndexConfig } from '@/sdk/define/indexes/index-config';
@@ -23,6 +25,8 @@ import { type ObjectConfig } from '@/sdk/define/objects/object-config';
 import { type PageLayoutConfig } from '@/sdk/define/page-layouts/page-layout-config';
 import { type PageLayoutTabConfig } from '@/sdk/define/page-layouts/page-layout-tab-config';
 import { type RoleConfig } from '@/sdk/define/roles/role-config';
+import { type TimelineActivityTypeConfig } from '@/sdk/define/timeline-activity-types/timeline-activity-type-config';
+import { type SettingsMenuItemConfig } from '@/sdk/define/settings-menu-items/settings-menu-item-config';
 import { type ViewConfig } from '@/sdk/define/views/view-config';
 import { readFile } from 'node:fs/promises';
 import { basename, extname, join, relative } from 'path';
@@ -47,10 +51,15 @@ import {
   type PostInstallLogicFunctionApplicationManifest,
   type PreInstallLogicFunctionApplicationManifest,
   type UninstallLogicFunctionApplicationManifest,
+  type HealthCheckLogicFunctionApplicationManifest,
   type RoleManifest,
   type SkillManifest,
+  type StandalonePageLayoutWidgetManifest,
   type StandaloneViewFieldManifest,
+  type SettingsMenuItemManifest,
+  type TimelineActivityTypeManifest,
   type ViewManifest,
+  type WorkflowManifest,
 } from 'twenty-shared/application';
 import {
   getInputSchemaFromSourceCode,
@@ -100,6 +109,7 @@ export const buildManifest = async (
 
   let applicationConfig: ApplicationConfig | undefined;
   const objectConfigs: ObjectConfig[] = [];
+  const roleConfigs: RoleConfig[] = [];
   const objects: ObjectManifest[] = [];
   const fields: FieldManifest[] = [];
   const indexes: IndexManifest[] = [];
@@ -107,6 +117,7 @@ export const buildManifest = async (
   const roles: RoleManifest[] = [];
   const skills: SkillManifest[] = [];
   const agents: AgentManifest[] = [];
+  const workflows: WorkflowManifest[] = [];
   const connectionProviders: ConnectionProviderManifest[] = [];
   const logicFunctions: LogicFunctionManifest[] = [];
   const frontComponents: FrontComponentManifest[] = [];
@@ -116,12 +127,17 @@ export const buildManifest = async (
   const navigationMenuItems: NavigationMenuItemManifest[] = [];
   const pageLayouts: PageLayoutManifest[] = [];
   const pageLayoutTabs: PageLayoutTabManifest[] = [];
+  const pageLayoutWidgets: StandalonePageLayoutWidgetManifest[] = [];
   const commandMenuItems: CommandMenuItemManifest[] = [];
+  const timelineActivityTypes: TimelineActivityTypeManifest[] = [];
+  const settingsMenuItems: SettingsMenuItemManifest[] = [];
   const postInstallLogicFunctions: PostInstallLogicFunctionApplicationManifest[] =
     [];
   const preInstallLogicFunctions: PreInstallLogicFunctionApplicationManifest[] =
     [];
   const uninstallLogicFunctions: UninstallLogicFunctionApplicationManifest[] =
+    [];
+  const healthCheckLogicFunctions: HealthCheckLogicFunctionApplicationManifest[] =
     [];
   const settingsFrontComponentUniversalIdentifiers: string[] = [];
   const applicationRoleUniversalIdentifiers: string[] = [];
@@ -133,6 +149,7 @@ export const buildManifest = async (
   const rolesFilePaths: string[] = [];
   const skillsFilePaths: string[] = [];
   const agentsFilePaths: string[] = [];
+  const workflowsFilePaths: string[] = [];
   const connectionProvidersFilePaths: string[] = [];
   const logicFunctionsFilePaths: string[] = [];
   const frontComponentsFilePaths: string[] = [];
@@ -142,7 +159,10 @@ export const buildManifest = async (
   const navigationMenuItemsFilePaths: string[] = [];
   const pageLayoutsFilePaths: string[] = [];
   const pageLayoutTabsFilePaths: string[] = [];
+  const pageLayoutWidgetsFilePaths: string[] = [];
   const commandMenuItemsFilePaths: string[] = [];
+  const timelineActivityTypesFilePaths: string[] = [];
+  const settingsMenuItemsFilePaths: string[] = [];
 
   for (const filePath of filePaths) {
     const fileContent = await readFile(filePath, 'utf-8');
@@ -214,8 +234,7 @@ export const buildManifest = async (
           appPath,
           filePath,
         });
-        const roleConfig = fromRoleConfigToRoleManifest(extract.config);
-        roles.push(roleConfig);
+        roleConfigs.push(extract.config);
         errors.push(...extract.errors);
         warnings.push(...(extract.warnings ?? []));
         rolesFilePaths.push(relativePath);
@@ -248,6 +267,17 @@ export const buildManifest = async (
         errors.push(...extract.errors);
         warnings.push(...(extract.warnings ?? []));
         agentsFilePaths.push(relativePath);
+        break;
+      }
+      case ManifestEntityKey.Workflows: {
+        const extract = await extractManifestFromFile<WorkflowManifest>({
+          appPath,
+          filePath,
+        });
+        workflows.push(extract.config);
+        errors.push(...extract.errors);
+        warnings.push(...(extract.warnings ?? []));
+        workflowsFilePaths.push(relativePath);
         break;
       }
       case ManifestEntityKey.ConnectionProviders: {
@@ -348,6 +378,12 @@ export const buildManifest = async (
           targetFunctionName === TargetFunction.DefineUninstallLogicFunction
         ) {
           uninstallLogicFunctions.push({
+            universalIdentifier: extract.config.universalIdentifier,
+          });
+        }
+
+        if (targetFunctionName === TargetFunction.DefineHealthCheck) {
+          healthCheckLogicFunctions.push({
             universalIdentifier: extract.config.universalIdentifier,
           });
         }
@@ -478,6 +514,19 @@ export const buildManifest = async (
         pageLayoutTabsFilePaths.push(relativePath);
         break;
       }
+      case ManifestEntityKey.PageLayoutWidgets: {
+        const extract =
+          await extractManifestFromFile<StandalonePageLayoutWidgetManifest>({
+            appPath,
+            filePath,
+          });
+
+        pageLayoutWidgets.push(extract.config);
+        errors.push(...extract.errors);
+        warnings.push(...(extract.warnings ?? []));
+        pageLayoutWidgetsFilePaths.push(relativePath);
+        break;
+      }
       case ManifestEntityKey.CommandMenuItems: {
         const extract = await extractManifestFromFile<CommandMenuItemConfig>({
           appPath,
@@ -490,6 +539,31 @@ export const buildManifest = async (
         errors.push(...extract.errors);
         warnings.push(...(extract.warnings ?? []));
         commandMenuItemsFilePaths.push(relativePath);
+        break;
+      }
+      case ManifestEntityKey.TimelineActivityTypes: {
+        const extract =
+          await extractManifestFromFile<TimelineActivityTypeConfig>({
+            appPath,
+            filePath,
+          });
+
+        timelineActivityTypes.push(extract.config);
+        errors.push(...extract.errors);
+        warnings.push(...(extract.warnings ?? []));
+        timelineActivityTypesFilePaths.push(relativePath);
+        break;
+      }
+      case ManifestEntityKey.SettingsMenuItems: {
+        const extract = await extractManifestFromFile<SettingsMenuItemConfig>({
+          appPath,
+          filePath,
+        });
+
+        settingsMenuItems.push(extract.config);
+        errors.push(...extract.errors);
+        warnings.push(...(extract.warnings ?? []));
+        settingsMenuItemsFilePaths.push(relativePath);
         break;
       }
       case ManifestEntityKey.PublicAssets: {
@@ -549,6 +623,15 @@ export const buildManifest = async (
 
       objects.push(objectManifest);
     }
+
+    for (const roleConfig of roleConfigs) {
+      roles.push(
+        fromRoleConfigToRoleManifest({
+          roleConfig,
+          applicationUniversalIdentifier: applicationConfig.universalIdentifier,
+        }),
+      );
+    }
   }
 
   if (postInstallLogicFunctions.length > 1) {
@@ -567,6 +650,10 @@ export const buildManifest = async (
     errors.push('Only one uninstall logic function is allowed per application');
   }
 
+  if (healthCheckLogicFunctions.length > 1) {
+    errors.push('Only one health check is allowed per application');
+  }
+
   if (settingsFrontComponentUniversalIdentifiers.length > 1) {
     errors.push('Only one settings front component is allowed per application');
   }
@@ -575,10 +662,8 @@ export const buildManifest = async (
     errors.push('Only one defineApplicationRole is allowed per application');
   }
 
-  const {
-    sharedDependencies,
-    errors: sharedDependenciesErrors,
-  } = await extractFrontComponentSharedDependencies(appPath);
+  const { sharedDependencies, errors: sharedDependenciesErrors } =
+    await extractFrontComponentSharedDependencies(appPath);
 
   errors.push(...sharedDependenciesErrors);
 
@@ -601,6 +686,21 @@ export const buildManifest = async (
       fields,
     }),
   );
+
+  if (
+    isDefined(applicationConfig) &&
+    isDefined(resolvedDefaultRoleUniversalIdentifier)
+  ) {
+    errors.push(
+      ...validateAgentRolesWithinApplicationRole({
+        agents,
+        roles,
+        objects,
+        permissionFlags,
+        defaultRoleUniversalIdentifier: resolvedDefaultRoleUniversalIdentifier,
+      }),
+    );
+  }
 
   const application: ApplicationManifest | undefined =
     applicationConfig && resolvedDefaultRoleUniversalIdentifier
@@ -629,6 +729,9 @@ export const buildManifest = async (
               : {}),
             ...(uninstallLogicFunctions.length >= 1
               ? { uninstallLogicFunction: uninstallLogicFunctions[0] }
+              : {}),
+            ...(healthCheckLogicFunctions.length >= 1
+              ? { healthCheckLogicFunction: healthCheckLogicFunctions[0] }
               : {}),
             ...(settingsFrontComponentUniversalIdentifiers.length >= 1
               ? {
@@ -662,6 +765,7 @@ export const buildManifest = async (
         roles: roles.sort(byId),
         skills: skills.sort(byId),
         agents: agents.sort(byId),
+        workflows: workflows.sort(byId),
         connectionProviders: connectionProviders.sort(byId),
         logicFunctions: logicFunctions.sort(byId),
         frontComponents: frontComponents.sort(byId),
@@ -671,7 +775,10 @@ export const buildManifest = async (
         navigationMenuItems: navigationMenuItems.sort(byId),
         pageLayouts: pageLayouts.sort(byId),
         pageLayoutTabs: pageLayoutTabs.sort(byId),
+        pageLayoutWidgets: pageLayoutWidgets.sort(byId),
         commandMenuItems: commandMenuItems.sort(byId),
+        timelineActivityTypes: timelineActivityTypes.sort(byId),
+        settingsMenuItems: settingsMenuItems.sort(byId),
       };
 
   const entityFilePaths: EntityFilePaths = {
@@ -683,6 +790,7 @@ export const buildManifest = async (
     roles: rolesFilePaths,
     skills: skillsFilePaths,
     agents: agentsFilePaths,
+    workflows: workflowsFilePaths,
     connectionProviders: connectionProvidersFilePaths,
     logicFunctions: logicFunctionsFilePaths,
     frontComponents: frontComponentsFilePaths,
@@ -692,7 +800,10 @@ export const buildManifest = async (
     navigationMenuItems: navigationMenuItemsFilePaths,
     pageLayouts: pageLayoutsFilePaths,
     pageLayoutTabs: pageLayoutTabsFilePaths,
+    pageLayoutWidgets: pageLayoutWidgetsFilePaths,
     commandMenuItems: commandMenuItemsFilePaths,
+    timelineActivityTypes: timelineActivityTypesFilePaths,
+    settingsMenuItems: settingsMenuItemsFilePaths,
   };
 
   return { manifest, filePaths: entityFilePaths, errors, warnings };

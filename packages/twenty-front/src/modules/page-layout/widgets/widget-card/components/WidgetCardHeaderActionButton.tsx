@@ -1,26 +1,30 @@
+import {
+  LightIconButton,
+  type LightIconButtonProps,
+} from 'twenty-ui/components/input';
 import { type IconComponent } from 'twenty-ui/icon';
-import { LightIconButton } from 'twenty-ui/input';
 
-type WidgetCardHeaderActionButtonProps = {
+type WidgetCardHeaderActionButtonProps = Omit<
+  LightIconButtonProps,
+  'aria-label' | 'title' | 'emphasis' | 'size' | 'children'
+> & {
   Icon: IconComponent;
   label: string;
-  onClick: () => void;
-  disabled?: boolean;
 };
 
 export const WidgetCardHeaderActionButton = ({
   Icon,
   label,
-  onClick,
-  disabled,
+  ...buttonProps
 }: WidgetCardHeaderActionButtonProps) => (
   <LightIconButton
-    Icon={Icon}
+    // oxlint-disable-next-line react/jsx-props-no-spreading
+    {...buttonProps}
     aria-label={label}
     title={label}
-    accent="tertiary"
-    size="small"
-    onClick={onClick}
-    disabled={disabled}
-  />
+    emphasis="subtle"
+    size="sm"
+  >
+    <Icon />
+  </LightIconButton>
 );
