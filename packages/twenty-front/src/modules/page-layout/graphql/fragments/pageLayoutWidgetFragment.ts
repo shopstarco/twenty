@@ -184,6 +184,7 @@ export const PAGE_LAYOUT_WIDGET_FRAGMENT = gql`
         viewId
         nestedRelationFieldMetadataId
         isUIEditable
+        startsExpanded
       }
       ... on FieldRichTextConfiguration {
         configurationType

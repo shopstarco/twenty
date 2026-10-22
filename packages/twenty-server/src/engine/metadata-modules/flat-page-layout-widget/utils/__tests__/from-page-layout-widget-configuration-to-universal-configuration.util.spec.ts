@@ -51,6 +51,26 @@ const getUniversalRecordFilters = (
 };
 
 describe('fromPageLayoutWidgetConfigurationToUniversalConfiguration', () => {
+  it.each([true, false])(
+    'preserves startsExpanded=%s on field cards',
+    (startsExpanded) => {
+      expect(
+        fromPageLayoutWidgetConfigurationToUniversalConfiguration({
+          configuration: {
+            configurationType: WidgetConfigurationType.FIELD,
+            fieldMetadataId: RELATION_FIELD_ID,
+            fieldDisplayMode: FieldDisplayMode.CARD,
+            startsExpanded,
+          },
+          fieldMetadataUniversalIdentifierById,
+        }),
+      ).toMatchObject({
+        fieldMetadataId: RELATION_FIELD_UNIVERSAL_IDENTIFIER,
+        startsExpanded,
+      });
+    },
+  );
+
   it('should preserve front component widget header command menu item references', () => {
     const headerCommandMenuItemUniversalIdentifiers = [
       '30303030-3333-4333-8333-000000000003',

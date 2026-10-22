@@ -46,4 +46,9 @@ export class FieldConfigurationDTO implements FieldConfiguration {
   @IsOptional()
   @IsBoolean()
   isUIEditable?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  startsExpanded?: boolean;
 }

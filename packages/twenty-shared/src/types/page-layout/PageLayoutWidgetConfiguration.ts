@@ -105,6 +105,7 @@ export type FieldConfiguration = {
   // One-to-many relation field on the target object, for records two hops away (e.g. Company -> People -> Owned opportunities).
   nestedRelationFieldMetadataId?: string | null;
   isUIEditable?: boolean;
+  startsExpanded?: boolean;
 };
 
 export type FormFieldConfiguration = {

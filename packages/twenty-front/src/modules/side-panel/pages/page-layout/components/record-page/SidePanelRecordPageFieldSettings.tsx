@@ -37,6 +37,7 @@ import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { isDefined } from 'twenty-shared/utils';
 import {
+  IconArrowsVertical,
   IconLayoutSidebarRight,
   IconListDetails,
   IconPencil,
@@ -130,6 +131,14 @@ export const SidePanelRecordPageFieldSettings = () => {
   }
 
   const isTableDisplayMode = currentDisplayMode === FieldDisplayMode.TABLE;
+  const isCardDisplayMode = currentDisplayMode === FieldDisplayMode.CARD;
+  const startsExpanded = fieldConfiguration?.startsExpanded === true;
+
+  const handleStartsExpandedChange = (nextStartsExpanded: boolean) => {
+    updateCurrentWidgetConfig({
+      configToUpdate: { startsExpanded: nextStartsExpanded },
+    });
+  };
 
   const showViewLayoutRows =
     isTableDisplayMode &&
@@ -185,6 +194,7 @@ export const SidePanelRecordPageFieldSettings = () => {
   const selectableItemIds = [
     'field',
     'layout',
+    ...(isCardDisplayMode ? ['starts-expanded'] : []),
     ...(showViewLayoutRows
       ? getWidgetViewLayoutSettingsItemIds({
           isCalendarLayout: isEmbeddedViewCalendarLayout,
@@ -254,6 +264,17 @@ export const SidePanelRecordPageFieldSettings = () => {
                 </DropdownContent>
               </DropdownRoot>
             </SelectableListItem>
+            {isCardDisplayMode && (
+              <SelectableListItem itemId="starts-expanded">
+                <CommandMenuItemSwitch
+                  LeftIcon={IconArrowsVertical}
+                  text={t`Starts expanded`}
+                  id="starts-expanded"
+                  checked={startsExpanded}
+                  onCheckedChange={handleStartsExpandedChange}
+                />
+              </SelectableListItem>
+            )}
             {isTableDisplayMode &&
               isDefined(targetObjectMetadataId) &&
               isDefined(currentViewId) && (

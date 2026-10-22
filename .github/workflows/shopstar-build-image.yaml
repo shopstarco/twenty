@@ -3,22 +3,22 @@ name: shopstar - build image
 on:
   push:
     branches:
-      - feat/field-card-starts-expanded
+      - upgrade/twenty-upstream-20261022
   workflow_dispatch:
     inputs:
       image_tag:
         description: Tag to publish under ghcr.io/shopstarco/twenty
         required: true
-        default: v2.32.1-starts-expanded
+        default: v2.51.0-starts-expanded
       app_version:
         description: APP_VERSION baked into the image
         required: true
-        default: v2.32.1
+        default: 2.51.0
 
 env:
   IMAGE: ghcr.io/shopstarco/twenty
-  DEFAULT_IMAGE_TAG: v2.32.1-starts-expanded
-  DEFAULT_APP_VERSION: v2.32.1
+  DEFAULT_IMAGE_TAG: v2.51.0-starts-expanded
+  DEFAULT_APP_VERSION: 2.51.0
 
 jobs:
   build:

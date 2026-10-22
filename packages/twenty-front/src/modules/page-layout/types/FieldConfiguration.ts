@@ -11,4 +11,5 @@ export type FieldConfiguration = {
   viewId?: string;
   nestedRelationFieldMetadataId?: string | null;
   isUIEditable?: boolean;
+  startsExpanded?: boolean;
 };
